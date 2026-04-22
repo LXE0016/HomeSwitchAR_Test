@@ -44,6 +44,8 @@ body { margin:0; overflow:hidden; }
   </a-camera>
 
   <a-entity id="rotator" position="0 1.2 -1.8" scale="2 2 2">
+  
+    <a-entity id="rotator" visible="false" ...>
 
     <a-entity
       id="model"
@@ -68,6 +70,13 @@ let sceneReady = false;
 
 scene.addEventListener('loaded', () => {
   sceneReady = true;
+});
+
+  scene.addEventListener('enter-vr', () => {
+  if (scene.is('ar-mode')) {
+    placed = false;
+    rotator.setAttribute('visible', false);
+  }
 });
 
 document.getElementById('enterAR').onclick = async () => {
@@ -184,6 +193,26 @@ window.addEventListener('click', () => {
     pos.y - 0.5,
     pos.z - 1.5
   );
+
+  placed = true;
+});
+
+  window.addEventListener('click', () => {
+
+  if (!scene.is('ar-mode')) return;
+  if (placed) return;
+
+  rotator.setAttribute('visible', true);
+
+  rotator.setAttribute('rotation', {x:0, y:0, z:0});
+  rotator.setAttribute('scale', '1 1 1');
+
+  const camObj = cam.object3D;
+  const pos = new THREE.Vector3();
+  camObj.getWorldPosition(pos);
+
+  rotator.object3D.position.copy(pos);
+  rotator.object3D.translateZ(-1.5); 
 
   placed = true;
 });
