@@ -1,4 +1,22 @@
 <!DOCTYPE html>
+
+<button id="enterAR">進入 AR</button>
+
+<style>
+#enterAR{
+  position: fixed;
+  bottom:20px;
+  left:50%;
+  transform:translateX(-50%);
+  padding:12px 20px;
+  background:black;
+  color:white;
+  border:none;
+  border-radius:8px;
+  z-index:999;
+}
+</style>
+
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -42,6 +60,19 @@ body { margin:0; overflow:hidden; }
 </a-scene>
 
 <script>
+
+  document.getElementById('enterAR').onclick = async () => {
+  const scene = document.querySelector('a-scene');
+
+  if (scene.renderer.xr) {
+    try {
+      await scene.enterVR(); // 🔥 強制進 AR
+    } catch (e) {
+      alert("這台裝置不支援 AR");
+    }
+  }
+};
+  
 const rotator = document.querySelector('#rotator');
 const model = document.querySelector('#model');
 const cam = document.querySelector('#cam');
