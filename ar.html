@@ -30,10 +30,10 @@
   embedded
   renderer="logarithmicDepthBuffer: true;"
   vr-mode-ui="enabled:false"
-  arjs="sourceType: webcam; debugUIEnabled: false;"
+  arjs="sourceType: webcam; debugUIEnabled: true;"
 >
 
-  <a-camera look-controls="enabled:false"></a-camera>
+  <a-entity camera></a-entity>
 
   <a-entity
     gltf-model="switch.glb"
@@ -41,9 +41,6 @@
     scale="1 1 1"
     rotation="90 0 0">
   </a-entity>
-
-  <a-light type="ambient" intensity="0.9"></a-light>
-  <a-light type="directional" position="1 2 1" intensity="1"></a-light>
 
 </a-scene>
 
