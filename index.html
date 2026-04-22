@@ -1,49 +1,118 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<script src="https://aframe.io/releases/1.4.0/aframe.min.js"></script>
 
-  <style>
-    #hint{
-      position: fixed;
-      bottom:20px;
-      left:50%;
-      transform:translateX(-50%);
-      background:rgba(0,0,0,0.6);
-      color:white;
-      padding:10px 15px;
-      border-radius:8px;
-      font-size:14px;
-      z-index:999;
-    }
-  </style>
+<style>
+body { margin:0; overflow:hidden; }
+</style>
 </head>
 
-<body style="margin:0; overflow:hidden;">
-
-<div id="hint">點右下角 AR 進入實景</div>
+<body>
 
 <a-scene
   vr-mode-ui="enabled: true"
   webxr="requiredFeatures: hit-test,local-floor"
-  renderer="colorManagement: true;"
 >
 
-  <a-camera position="0 1.6 0"></a-camera>
+  <a-camera 
+    id="cam"
+    position="0 1.6 2"
+    look-controls="enabled: false">
+  </a-camera>
 
-  <a-entity
-    id="model"
-    gltf-model="switch.glb"
-    position="0 1.2 -2"
-    scale="1 1 1"
-    rotation="90 0 0">
+  <a-entity id="rotator" position="0 1.2 -2">
+
+    <a-entity
+      id="model"
+      gltf-model="switch.glb"
+      scale="1 1 1"
+      rotation="90 0 0">
+    </a-entity>
+
   </a-entity>
 
   <a-light type="ambient" intensity="1"></a-light>
   <a-light type="directional" position="1 3 2" intensity="1"></a-light>
 
 </a-scene>
+
+<script>
+const rotator = document.querySelector('#rotator');
+const model = document.querySelector('#model');
+
+let isDragging = false;
+let px = 0, py = 0;
+
+function start(x,y){
+  isDragging = true;
+  px = x;
+  py = y;
+}
+
+function move(x,y){
+  if(!isDragging) return;
+
+  let dx = x - px;
+  let dy = y - py;
+
+  px = x;
+  py = y;
+
+  let r = rotator.getAttribute('rotation');
+
+  r.y += dx * 0.5;
+  r.x -= dy * 0.3;
+  r.x = Math.max(-30, Math.min(30, r.x));
+
+  rotator.setAttribute('rotation', r);
+}
+
+function end(){
+  isDragging = false;
+}
+
+document.addEventListener('mousedown', e => start(e.clientX, e.clientY));
+document.addEventListener('mousemove', e => move(e.clientX, e.clientY));
+document.addEventListener('mouseup', end);
+
+document.addEventListener('touchstart', e => {
+  if(e.touches.length === 1){
+    start(e.touches[0].clientX, e.touches[0].clientY);
+  }
+});
+document.addEventListener('touchmove', e => {
+  if(e.touches.length === 1){
+    move(e.touches[0].clientX, e.touches[0].clientY);
+  }
+});
+document.addEventListener('touchend', end);
+
+
+let placed = false;
+
+window.addEventListener('click', () => {
+
+  const scene = document.querySelector('a-scene');
+
+  if (!scene.is('ar-mode')) return;
+
+  if (placed) return;
+
+  const cam = document.querySelector('#cam');
+  const pos = cam.object3D.getWorldPosition(new THREE.Vector3());
+
+  model.object3D.position.set(
+    pos.x,
+    pos.y - 0.5,
+    pos.z - 1.5
+  );
+
+  placed = true;
+});
+
+</script>
 
 </body>
 </html>
